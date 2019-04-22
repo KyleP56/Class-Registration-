@@ -1,0 +1,19 @@
+
+package schedule;
+
+public class Online extends Course{
+   
+    public Online (String N, String crn, String cNum, String S, String cHours, String T, String I){
+        super(N, crn, cNum, S, cHours, T, I);
+    }
+    
+    @Override
+    public String toString(){
+        return Name + " " +  crn + " " + courseNumber + " " + Section + " " + creditHours + " " + Type + " " +Instructor;
+    }
+    
+    @Override
+    public boolean conflictsWith(Course c){
+        return true;
+    }
+}
