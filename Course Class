@@ -1,0 +1,38 @@
+package schedule;
+
+import java.time.LocalTime;
+
+public abstract class Course {
+    public String Name;
+    public String crn;
+    public String courseNumber;
+    public String Section;
+    public String creditHours;
+    public String Type;
+    public String Instructor;
+    public LocalTime startTime;
+    public LocalTime endTime;
+    public String meetDays;
+ 
+    public Course(String N, String crn, String cNum, String S, String cHours, String T, String I){
+        this.Name = N;
+        this.crn = crn;
+        this.courseNumber = cNum;
+        this.Section = S;
+        this.creditHours = cHours;
+        this.Type = T;
+        this.Instructor = I;
+    }
+    public String getMeetDays(){
+        return meetDays;
+    }
+
+    public String getNum(){
+        return courseNumber;
+    }
+    
+    public String getCRN(){
+        return crn;
+    }
+    public abstract boolean conflictsWith(Course c);
+}
