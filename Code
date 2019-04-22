@@ -1,0 +1,171 @@
+package schedule;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.nio.file.Paths;
+import java.time.LocalTime;
+import java.util.Arrays;
+
+
+public class Schedule {
+
+    public static void main(String[] args) {
+        boolean close = false;
+        String Line;
+        
+        // List that will be used to capture data
+        ArrayList<Course> catalog = new ArrayList<>();
+        ArrayList<Course> trialSchedule = new ArrayList<>();
+        ArrayList<String> Values = null;
+        
+        //reading in the input file
+        try{
+            Scanner in = new Scanner(Paths.get("project1input.csv"), "UTF-8");
+            Scanner scan = new Scanner(System.in);
+            
+            //while in file, assigning objects to a list
+            while(in.hasNextLine()){
+                Line = in.nextLine();
+                Values = new ArrayList(Arrays.asList(Line.split("\t")));
+                
+                // assigns input to online course type
+                if (Values.get(5).equals("World Wide Web")){
+                    Course O = new Online(Values.get(0), Values.get(1), Values.get(2), Values.get(3), Values.get(4), Values.get(5), Values.get(6));
+                    catalog.add(O);
+                }
+                //assigns input to traditional course type
+                else{
+                    String[] time = Values.get(5).split(":");
+                    int hour1 = Integer.parseInt(time[0]);
+                    int min1 = Integer.parseInt(time[1]);
+                    LocalTime start = LocalTime.of(hour1,min1);
+                    
+                    String[] end = Values.get(6).split(":");
+                    int hour2 = Integer.parseInt(end[0]);
+                    int min2 = Integer.parseInt(end[1]);
+                    LocalTime ed = LocalTime.of(hour2,min2);
+                    
+                    Course T = new Traditional(Values.get(0), Values.get(1), Values.get(2), Values.get(3), Values.get(4), start , ed , Values.get(7), Values.get(8), Values.get(9), Values.get(10));
+                    catalog.add(T);
+                }
+            }
+            // closing input file
+            in.close();
+            
+            //menu screen
+            while (!close){
+                
+                int choice = 0;
+                boolean done = false;
+                
+                while (!done){
+                    //prints menu out for user input
+                    System.out.println("\n" + "1. Search Courses");
+                    System.out.println("2. Register for Courses ");
+                    System.out.println("3. View Trail Schedule ");
+                    System.out.println("4. Quit ");
+                    
+                    choice = scan.nextInt();
+                    // checks to make sure the user's entry was within the options
+                    if (choice < 1 || choice > 4){
+                        System.out.println("ERROR; Invalid input, please enter choice another option. ");
+                    }
+                    else{
+                        System.out.println("Your choice: " + choice);
+                        done = true;
+                    }
+                }
+                
+                // switch statement based of user input
+                switch (choice){
+                    case 1:
+                        
+                        String number = "";
+                        boolean valid = false;
+                        // ask for the course number
+                        while (!valid){
+                            System.out.println("\n"+ "Enter the course number in the format of SSNNN, for example CS201 ");
+                            number = scan.next().toUpperCase().trim();
+                            
+                            //formats the input no matter how the user inputs to make every input the say
+                            if (number.length() == 5){
+                                number = number.substring(0, 2) + ' '+ number.substring(2, 5);
+                                valid = true;
+                            }
+                            else{
+                                System.out.println("ERROR: Invalid entry, try again!");
+                            }
+                        }
+                        //List for the course results found
+                        ArrayList<Course> results = new ArrayList<>();
+                        
+                        //searching catalog and find courses based off the user input
+                        for (int i = 0; i < catalog.size(); i++){
+                            if (catalog.get(i).getNum().equals(number)){
+                                results.add(catalog.get(i));
+                            }
+                        }
+                        // outputs the results to the screen
+                        for (int i = 0; i <results.size(); i++){
+                            System.out.println(results.get(i).toString());
+                        }
+                        break;
+                        
+                    //function if the user inputs option 2    
+                    case 2:
+                        // ask the user for the crn number
+                        System.out.println("\n" + "Please enter the CRN number for the course you would like to register for. ");
+                        String num = scan.next();
+                        
+                        Course c = null;
+                        // check the catalog for the correct crn number and adds it a blank course
+                        for(int i = 0; i < catalog.size(); i++){
+                                
+                            if (catalog.get(i).getCRN().equals(num)){
+                                c = catalog.get(i);
+                            }
+                        }
+                            
+                        boolean conflicts = false;
+                        // checks to see if the course being added conflicts with any of the already added courses    
+                        if (!trialSchedule.isEmpty()){
+                                
+                            for (Course s : trialSchedule){
+                                    
+                                if (s.conflictsWith(c))
+                                    conflicts = true;
+                            }
+                        }
+                        // if there are no conflicts add the course to the trialSchedule
+                        if (!conflicts){
+                            
+                            trialSchedule.add(c);
+                            System.out.println("Course was added successfully ");
+                            }
+                        // if there was a conflict let the user know
+                        else{
+                            System.out.println("Something went wrong, try entering the CRN again!");
+                        }
+                     
+                        break;
+                        
+                    // outputs the users schedule 
+                    case 3:
+                        for(int i = 0; i < trialSchedule.size(); i++){
+                            System.out.println(trialSchedule.get(i).toString());
+                        }
+                        break;
+                    //closes the program    
+                    case 4:
+                        System.out.println("Thank you for registering your classes!");
+                        close = true;
+                }
+            }
+            
+        }
+        catch (Exception e){
+            System.err.println(e.toString());
+        }
+        
+    }
+    
+}
