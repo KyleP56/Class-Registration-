@@ -1,0 +1,57 @@
+package schedule;
+
+import java.time.LocalTime;
+
+public class Traditional extends Course {
+
+    public String meetDays;
+    public String Location;
+
+    public Traditional(String N, String crn, String cNum, String S, String cHours, LocalTime sTime, LocalTime eTime, String mDays, String L, String T, String I) {
+        super(N, crn, cNum, S, cHours, T, I);
+        this.startTime = sTime;
+        this.endTime = eTime;
+        this.meetDays = mDays;
+        this.Location = L;
+    }
+    public String getMeetDays(){
+        return meetDays;
+    }
+
+    @Override
+    public String toString() {
+        return Name + " " + crn + " " + courseNumber + " " + Section + " " + creditHours + " " + startTime + " " + endTime + " " + meetDays + " " + Location + " " + Type + " " + Instructor;
+    }
+
+    @Override
+    public boolean conflictsWith(Course c){
+        boolean conflicts = false;
+        boolean shareDays = false;
+        
+        if (this.getMeetDays().equals(c.getMeetDays())){
+            shareDays = true;
+        }
+        
+        if ( shareDays ){
+            
+            if(
+                    //starts before and end during or after
+                    (this.endTime.isBefore(c.startTime)) &&
+                    (this.endTime.isAfter(c.startTime)) || 
+                    //starts during and ends after
+                    (this.startTime.isBefore(c.endTime)) &&
+                    (this.endTime.isAfter(c.endTime)) ||
+                    //starts during and stops during
+                    (this.startTime.isAfter(c.startTime)) &&
+                    (this.endTime.isBefore(c.endTime)) ||
+                    //starts or stops at the same time
+                    (this.startTime.equals(c.startTime)) ||
+                    (this.endTime.equals(c.endTime))
+                    
+                    ){
+                conflicts = true;
+            }
+        }
+        return conflicts;
+    }
+}
